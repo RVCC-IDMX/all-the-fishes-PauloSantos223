@@ -16,12 +16,21 @@
     await app.init({
         width:1080, 
         height:840,
-        backgroundColor: 0x000000
+        backgroundColor: 0x1099bb
         
     });
 
-    // Add view to the body
-    document.body.appendChild(app.canvas);
+     // Add view to the body
+     document.body.appendChild(app.view);
+    
+    
+    
+    
+    
+
+
+
+   
 
 
     // Expose the app to the document
@@ -31,17 +40,39 @@
     await PIXI.Assets.load('img/Coral PNG.png');
     await PIXI.Assets.load('img/Fish PNG.png');
     await PIXI.Assets.load('img/Fish 2 PNG.png');
+    await PIXI.Assets.load('img/Fish 3 PNG.png');
+    await PIXI.Assets.load('img/aquarium-background.jpg');
     
+
+    
+
+    // Aquarium background
+    const background = PIXI.Sprite.from('img/aquarium-background.jpg');
+    background.width = app.screen.width;
+    background.height = app.screen.height;
+    app.stage.addChild(background);
+
+
+
 
     // Adds Coral
     let coral1 = PIXI.Sprite.from('img/Coral PNG.png');
-        coral1.scale.set(.4);
+        coral1.scale.set(.2);
         coral1.x = 200;
-        coral1.y = 200;
+        coral1.y = 560;
 
-    //Adds the coral
+    //Adds the coral to the stage
     app.stage.addChild(coral1);
 
+    // Adds Fish 3
+    let fish3 = PIXI.Sprite.from('img/Fish 3 PNG.png');
+        fish3.scale.set(.25);
+        fish3.scale.x = -.25;
+        fish3.scale.y = -.25;
+        fish3.anchor.x = .9;
+        fish3.anchor.y = .5;
+        fish3.x = -100;
+        fish3.y = 400;
 
     // Add our first sprite
     let fish1 = PIXI.Sprite.from('img/Fish PNG.png');
@@ -72,6 +103,7 @@
     let fishContainer = new PIXI.Container();
         fishContainer.addChild(fish1);
         fishContainer.addChild(fish2);
+        fishContainer.addChild(fish3);
         fishContainer.x = 100;
         fishContainer.y = 100;
 
@@ -99,6 +131,13 @@
         fish2.x = (Math.sqrt(counter/100) * 40) + 800;
         fish2.angle = (Math.sin(counter/80) * 10);
         fish2.scale.x = (Math.sin(counter/100) * .05) + -.25;
+
+        // Fish 3 animation 
+    if (counter % 50 === 0) {  
+        fish3.tint = 0xFFFFFF * Math.random();
+    }
+        fish3.x = (Math.sin(counter / 60) * 300) + 300;
+        fish3.y = (Math.sin(counter / 60) * 300) + 300;
 
         
 
