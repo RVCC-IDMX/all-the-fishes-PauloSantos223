@@ -42,6 +42,7 @@
     await PIXI.Assets.load('img/Fish 2 PNG.png');
     await PIXI.Assets.load('img/Fish 3 PNG.png');
     await PIXI.Assets.load('img/aquarium-background.jpg');
+    await PIXI.Assets.load('img/bubble.png');
     
 
     
@@ -55,24 +56,42 @@
 
 
 
+    // Bubbles
+    const bubbles = [];
+    for (let i = 0; i < 20; i++) {
+        const bubble = PIXI.Sprite.from('img/bubble.png');
+        bubble.x = Math.random() * app.screen.width;
+        bubble.y = app.screen.height + Math.random() * 200;
+        bubble.scale.set(0.05 + Math.random() * 0.1);
+        bubbles.push(bubble);
+        app.stage.addChild(bubble);
+    }
+
+
     // Adds Coral
     let coral1 = PIXI.Sprite.from('img/Coral PNG.png');
-        coral1.scale.set(.2);
+        coral1.scale.set(.25);
         coral1.x = 200;
-        coral1.y = 560;
+        coral1.y = 540;
+
+    // Adds Coral 2
+    let coral2 = PIXI.Sprite.from('img/Coral PNG.png');
+        coral2.scale.set(.25);
+        coral2.x = 500;
+        coral2.y = 580;
 
     //Adds the coral to the stage
     app.stage.addChild(coral1);
+    app.stage.addChild(coral2);
 
     // Adds Fish 3
     let fish3 = PIXI.Sprite.from('img/Fish 3 PNG.png');
         fish3.scale.set(.25);
         fish3.scale.x = -.25;
         fish3.scale.y = -.25;
-        fish3.anchor.x = .9;
-        fish3.anchor.y = .5;
-        fish3.x = -100;
-        fish3.y = 400;
+        fish3.anchor.x = 0.5;
+        fish3.anchor.y = 0.5;
+       
 
     // Add our first sprite
     let fish1 = PIXI.Sprite.from('img/Fish PNG.png');
@@ -80,7 +99,7 @@
         fish1.tint = 0xFFFF1;
         fish1.scale.x = -.25;
         fish1.anchor.x = .9;
-        fish1.anchor.y = .5;
+        fish1.anchor.y = .65;
         fish1.x = 150;
         fish1.y = 200;
 
@@ -94,7 +113,7 @@
         fish2.anchor.set(0);
         fish2.tint = 0xFF4520;
         fish2.y = 100;
-        fish2.x = 550;
+        fish2.x = 500;
 
     // Add it to the stage
     //app.stage.addChild(fish2);
@@ -108,8 +127,13 @@
         fishContainer.y = 100;
 
 
+
+    
+
     // Add it to the stage
     app.stage.addChild(fishContainer);
+
+    
 
 
     // Counter
@@ -136,11 +160,27 @@
     if (counter % 50 === 0) {  
         fish3.tint = 0xFFFFFF * Math.random();
     }
-        fish3.x = (Math.sin(counter / 50) * 80) + 200;
-        fish3.y = (Math.sin(counter / 40) * 100) + 100;
-        fish3.angle =  (Math.sin(counter/80) * 10);
-
         
+        const newX = (Math.sin(counter / 50) * 80) + 200;
+        const newY = (Math.sin(counter / 40) * 100) + 100;
+
+        fish3.x = Math.max(100, Math.min(newX, app.screen.width - fish3.width - 100));
+        fish3.y = Math.max(100, Math.min(newY, app.screen.height - fish3.height - 100));
+        fish3.angle =  (Math.sin(counter/80) * 10) + counter / 10;
+
+        // Coral 1 and Coral 2 Animation
+        coral1.angle = Math.sin(counter / 100) * 3; 
+        coral2.angle = Math.sin(counter / 120) * 2.5; 
+
+
+        // Bubbles animation
+        bubbles.forEach((bubble) => {
+            bubble.y -= 20; // Bubble rising speed
+            if (bubble.y < -bubble.height) { 
+                bubble.y = app.screen.height + Math.random() * 500;
+                bubble.x = Math.random() * app.screen.width;
+            }
+        });
 
         requestAnimationFrame(loop);
 
