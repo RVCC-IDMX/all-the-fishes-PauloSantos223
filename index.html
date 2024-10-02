@@ -152,8 +152,24 @@ changeColorButton.on("pointertap", () => {
         fish1.scale.x = -.25;
         fish1.anchor.x = .9;
         fish1.anchor.y = .65;
-        fish1.x = 150;
+        fish1.x = 350;
         fish1.y = 200;
+
+
+    // Bobbing state for fish1
+    let fish1Bobbing = true;
+    let fish1BobbingTargetY = fish1.y;
+    let fish1SurfaceY = fish1.y - 200; 
+
+    // Click event for fish1 to swim up to the surface
+    fish1.interactive = true;
+    fish1.on('pointertap', () => {
+        if (fish1Bobbing) {
+            fish1Bobbing = false; 
+            fish1BobbingTargetY = fish1SurfaceY; 
+        }
+});
+    
 
     // Add it to the stage
     //app.stage.addChild(fish1);
@@ -167,36 +183,17 @@ changeColorButton.on("pointertap", () => {
         fish2.y = 100;
         fish2.x = 500;
 
-    // Makes fish2 draggable
-    fish2.interactive = true;
-    fish2.buttonMode = true; 
+    app.stage.addChild(fish2);
 
-    fish2.draggable = true;   
-    fish2.dragging = false;   
-    fish2.offsetX;
-    fish2.offsetY;
+    let fish2TargetX = fish2.x;
+    let fish2TargetY = fish2.y;
+    let fish2Moving = false;
 
-    fish2.on("pointerdown", (e) => { 
-    if (!fish2.draggable) return;
-    fish2.dragging = true;
-    fish2.offsetX = fish2.x - e.data.global.x;
-    fish2.offsetY = fish2.y - e.data.global.y;
-});
-
-    fish2.on("pointermove", (e) => { 
-    if (!fish2.draggable || !fish2.dragging) return;
-    fish2.x = e.data.global.x + fish2.offsetX;
-    fish2.y = e.data.global.y + fish2.offsetY;
-});
-
-    fish2.on("pointerup", (e) => {  
-    if (!fish2.draggable) return;
-    fish2.dragging = false;
-});
-
-    fish2.on("pointerupoutside", (e) => {  
-    if (!fish2.draggable) return;
-    fish2.dragging = false;
+    app.stage.interactive = true;
+    app.stage.on('pointertap', (event) => {
+        fish2TargetX = event.data.global.x;
+        fish2TargetY = event.data.global.y;
+        fish2Moving = true;
 });
 
 
@@ -209,7 +206,6 @@ changeColorButton.on("pointertap", () => {
     //Fish container
     let fishContainer = new PIXI.Container();
         fishContainer.addChild(fish1);
-        fishContainer.addChild(fish2);
         fishContainer.addChild(fish3);
         fishContainer.x = 100;
         fishContainer.y = 100;
@@ -233,16 +229,47 @@ changeColorButton.on("pointertap", () => {
         counter++;
 
        //Fish 1 Animation
-        fish1.y = (Math.sin(counter/40) * 100) + 200;
-        fish1.angle = (Math.sin(counter/70) * 50);
-        fish1.scale.x = (Math.sin(counter/50) * .05) + -.25;
+       if (fish1Bobbing) {
+            fish1.y = (Math.sin(counter / 10) * 10) + 200; 
+            fish1.tint = 0xFFFFFF;
+        } else {
+        const dx = fish1.x - fish1.x; 
+        const dy = fish1BobbingTargetY - fish1.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        fish1.tint = 0x1a53ad;
+
+        if (distance > 5) { 
+            const speed = 5;
+            fish1.y += (dy / distance) * speed;
+        } else {
+        setTimeout(() => {
+            fish1Bobbing = true; 
+            fish1BobbingTargetY = fish1.y; 
+        }, 1000); // <- time at the surface
+    }
+} 
 
 
-        //Fish 2 Animation
-        fish2.y = (Math.sin(counter/50) * 80) + 150;
-        fish2.x = (Math.sqrt(counter/100) * 40) + 800;
-        fish2.angle = (Math.sin(counter/80) * 10);
-        fish2.scale.x = (Math.sin(counter/100) * .05) + -.25;
+        // Fish 2 idle animation when it's not moving
+        if (!fish2Moving) {
+            fish2.y = (Math.sin(counter / 50) * 80) + 150;
+            fish2.x = (Math.sqrt(counter / 100) * 40) + 500;
+            fish2.angle = (Math.sin(counter / 80) * 10);
+            fish2.scale.x = (Math.sin(counter / 100) * .05) + -.25;
+        } else {
+        // Fish 2 Animation when moving toward the user's pointer
+            const dx = fish2TargetX - fish2.x;
+            const dy = fish2TargetY - fish2.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance > 5) { 
+                const speed = 5; 
+                fish2.x += (dx / distance) * speed;
+                fish2.y += (dy / distance) * speed;
+            } else {
+            fish2Moving = false;
+        }
+    }
 
         // Fish 3 animation 
     if (counter % 50 === 0) {  
